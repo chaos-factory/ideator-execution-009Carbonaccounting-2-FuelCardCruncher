@@ -1,0 +1,94 @@
+%PDF-1.4
+1 0 obj
+<<
+/Type /Catalog
+/Pages 2 0 R
+>>
+endobj
+2 0 obj
+<<
+/Type /Pages
+/Kids [3 0 R]
+/Count 1
+>>
+endobj
+3 0 obj
+<<
+/Type /Page
+/Parent 2 0 R
+/Resources <<
+/Font <<
+/F1 4 0 R
+>>
+>>
+/MediaBox [0 0 612 792]
+/Contents 5 0 R
+>>
+endobj
+4 0 obj
+<<
+/Type /Font
+/Subtype /Type1
+/BaseFont /Helvetica
+>>
+endobj
+5 0 obj
+<<
+/Length 500
+>>
+stream
+BT
+/F1 24 Tf
+50 720 Td
+(FuelCard Cruncher - Sample Report) Tj
+0 -40 Td
+/F1 12 Tf
+(Scope 1 Mobile Combustion Emissions) Tj
+0 -30 Td
+(Period: April 2025) Tj
+0 -40 Td
+/F1 14 Tf
+(Summary KPIs:) Tj
+0 -25 Td
+/F1 12 Tf
+(Total CO2e: 24.1 tonnes) Tj
+0 -20 Td
+(Vehicles Reported: 23) Tj
+0 -20 Td
+(Transactions Processed: 5,000) Tj
+0 -20 Td
+(Average Intensity: 0.72 kg CO2e/mile) Tj
+0 -40 Td
+/F1 10 Tf
+(Emission Factors: EPA Emission Factors Hub \(January 2025\)) Tj
+0 -15 Td
+(GWP Basis: AR5-100) Tj
+0 -15 Td
+(Methodology: GHG Protocol Corporate Standard - Scope 1) Tj
+0 -15 Td
+(Version: 2025.1 \(locked\)) Tj
+0 -40 Td
+(This is a sample report for demonstration purposes.) Tj
+0 -15 Td
+(Actual reports include detailed charts, vehicle breakdowns,) Tj
+0 -15 Td
+(and a complete calculation log with citations.) Tj
+ET
+endstream
+endobj
+xref
+0 6
+0000000000 65535 f 
+0000000009 00000 n 
+0000000058 00000 n 
+0000000115 00000 n 
+0000000262 00000 n 
+0000000341 00000 n 
+trailer
+<<
+/Size 6
+/Root 1 0 R
+>>
+startxref
+893
+%%EOF
