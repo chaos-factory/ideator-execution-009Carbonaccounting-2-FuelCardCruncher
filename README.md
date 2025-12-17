@@ -1,0 +1,1 @@
+FuelCard Cruncher — Normalize WEX/Comdata fuel card CSVs into auditable Scope 1 (mobile combustion) emissions and fleet insights. Client-side Vite app with presets, validation, EPA 2025 AR5-100 factors, charts, and PDF/CSV exports.
