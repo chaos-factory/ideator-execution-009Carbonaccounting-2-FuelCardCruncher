@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Normalize WEX/Comdata fuel card CSVs into auditable Scope 1 emissions. Client-side processing with EPA 2025 factors.">
+    <title>FuelCard Cruncher — Fuel-card CSVs in. Auditable Scope 1 out.</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Section 1: Announcement bar -->
+    <div id="announcement-bar" class="announcement-bar">
+        <div class="container">
+            <div class="announcement-content">
+                <svg class="icon" width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                    <path d="M8 1C6.61553 1 5.26216 1.41054 4.11101 2.17971C2.95987 2.94888 2.06266 4.04213 1.53285 5.32122C1.00303 6.6003 0.86441 8.00776 1.13451 9.36563C1.4046 10.7235 2.07129 11.9708 3.05026 12.9497C4.02922 13.9287 5.2765 14.5954 6.63437 14.8655C7.99224 15.1356 9.3997 14.997 10.6788 14.4672C11.9579 13.9373 13.0511 13.0401 13.8203 11.889C14.5895 10.7378 15 9.38447 15 8C15 6.14348 14.2625 4.36301 12.9497 3.05025C11.637 1.7375 9.85652 1 8 1ZM8 11C7.80109 11 7.60632 10.941 7.43886 10.8315C7.27141 10.7221 7.13904 10.5668 7.05697 10.3834C6.9749 10.2 6.94646 9.99889 6.97498 9.80491C7.0035 9.61093 7.08765 9.42816 7.21967 9.29603C7.35169 9.16391 7.53446 9.07966 7.72844 9.05114C7.92243 9.02262 8.12354 9.05106 8.30691 9.13313C8.49028 9.2152 8.64556 9.34768 8.75502 9.51514C8.86447 9.68259 8.92334 9.87736 8.92334 10.0763C8.92334 10.3456 8.80997 10.6042 8.60718 10.807C8.40439 11.0098 8.14562 11.1232 7.87645 11.1232L8 11ZM8.92334 7.07669V8H7.07666V5.23084C7.07666 5.09615 7.1288 4.96718 7.22227 4.87371C7.31575 4.78024 7.44472 4.7281 7.57941 4.7281H8.42059C8.55528 4.7281 8.68425 4.78024 8.77773 4.87371C8.8712 4.96718 8.92334 5.09615 8.92334 5.23084V7.07669Z" fill="currentColor"/>
+                </svg>
+                <span>Client-side processing. Your CSVs never leave your browser.</span>
+            </div>
+            <button class="announcement-close" aria-label="Close announcement">
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                    <path d="M1 1L13 13M1 13L13 1" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+            </button>
+        </div>
+    </div>
+
+    <!-- Section 2: Sticky header / nav -->
+    <header id="header" class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="wordmark">FuelCard Cruncher</div>
+                <nav class="nav" id="nav">
+                    <a href="#product" class="nav-link">Product</a>
+                    <a href="#how-it-works" class="nav-link">How it works</a>
+                    <a href="#factors-methods" class="nav-link">Factors &amp; Methods</a>
+                    <a href="#schema-c" class="nav-link">Schema C</a>
+                    <a href="#exports" class="nav-link">Exports</a>
+                    <a href="#docs" class="nav-link">Docs</a>
+                </nav>
+                <div class="header-ctas">
+                    <a href="#" class="btn btn-outline">Download sample CSV</a>
+                    <a href="#" class="btn btn-primary">Launch in browser</a>
+                </div>
+                <button class="hamburger" id="hamburger" aria-label="Toggle menu" aria-expanded="false">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                        <path d="M3 12H21M3 6H21M3 18H21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
+                </button>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Mobile menu -->
+    <div class="mobile-menu" id="mobile-menu">
+        <div class="mobile-menu-content">
+            <a href="#product" class="mobile-menu-link">Product</a>
+            <a href="#how-it-works" class="mobile-menu-link">How it works</a>
+            <a href="#factors-methods" class="mobile-menu-link">Factors &amp; Methods</a>
+            <a href="#schema-c" class="mobile-menu-link">Schema C</a>
+            <a href="#exports" class="mobile-menu-link">Exports</a>
+            <a href="#docs" class="mobile-menu-link">Docs</a>
+            <div class="mobile-menu-cta">
+                <a href="#" class="btn btn-primary btn-block">Launch in browser</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Section 3: Hero -->
+    <section class="hero">
+        <div class="container">
+            <div class="hero-grid">
+                <div class="hero-content">
+                    <div class="eyebrow">FUEL CARD NORMALIZATION</div>
+                    <h1>Fuel-card CSVs in. Auditable Scope 1 out.</h1>
+                    <p class="subhead">Normalize WEX/Comdata files, fix units and fuel types, and compute CO₂e with EPA Emission Factors Hub 2025 (AR5-100). No telematics or servers required.</p>
+                    <div class="hero-ctas">
+                        <a href="#" class="btn btn-primary btn-large">Launch in browser</a>
+                        <a href="assets/sample-report.pdf" class="btn btn-outline btn-large">View a sample report</a>
+                    </div>
+                    <p class="hero-note">Works with WEX, Comdata, or any CSV mapped to <a href="#schema-c" class="text-link">Schema C</a>.</p>
+                    <div class="hero-secondary-cta">
+                        <a href="#schema-c" class="text-link">See Schema C →</a>
+                    </div>
+                </div>
+                <div class="hero-visual">
+                    <div class="mock-card">
+                        <div class="mock-section">
+                            <div class="mock-header">Import CSV</div>
+                            <div class="mock-dropdown">Select provider preset: WEX FleetCard</div>
+                        </div>
+                        <div class="mock-section">
+                            <div class="mock-header">Mapping / Validation</div>
+                            <div class="mock-warning">⚠ Unrecognized fuel_type at Row 42; map it.</div>
+                            <div class="mock-warning">⚠ Volume unit missing; choose gal or L.</div>
+                        </div>
+                        <div class="mock-section">
+                            <div class="mock-header">Results</div>
+                            <div class="mock-chart">
+                                <div class="mock-bar" style="height: 60%"></div>
+                                <div class="mock-bar" style="height: 80%"></div>
+                                <div class="mock-bar" style="height: 50%"></div>
+                            </div>
+                            <div class="mock-label">CO₂e by vehicle (last month)</div>
+                            <div class="mock-row">Vehicle 12 • Gasoline • 373.3 kg CO₂e</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section 4: Social proof strip -->
+    <section class="social-proof">
+        <div class="container">
+            <p class="social-proof-text">Built for SMB fleets and the consultants who serve them.</p>
+            <p class="social-proof-micro">1–50 vehicles. CSVs ready by the time your RFP is.</p>
+        </div>
+    </section>
+
+    <!-- Section 5: Problem → Promise split -->
+    <section id="product" class="problem-promise">
+        <div class="container">
+            <div class="split-grid">
+                <div class="split-column">
+                    <h2>Your fuel CSVs weren't designed for emissions reporting.</h2>
+                    <ul class="feature-list">
+                        <li>Every provider exports CSVs differently.</li>
+                        <li>Unit and fuel-type mismatches derail monthly reporting.</li>
+                        <li>Emissions clauses in RFPs can't wait for enterprise rollouts.</li>
+                    </ul>
+                </div>
+                <div class="split-column">
+                    <h2>FuelCard Cruncher makes Scope 1 a two-minute job.</h2>
+                    <ul class="feature-list">
+                        <li>Normalize WEX/Comdata/other CSVs with presets and mappings.</li>
+                        <li>Validate units, fuel types, dates, and odometers.</li>
+                        <li>Compute CO₂e with EPA 2025 factors (AR5-100), per vehicle and month.</li>
+                        <li>Export PDF and CSV with citations and an audit-ready calculation log.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section 6: Feature grid -->
+    <section class="feature-grid">
+        <div class="container">
+            <div class="grid-4">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+                            <path d="M8 12H24M8 16H24M8 20H16M6 6H26C27.1046 6 28 6.89543 28 8V24C28 25.1046 27.1046 26 26 26H6C4.89543 26 4 25.1046 4 24V8C4 6.89543 4.89543 6 6 6Z" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        </svg>
+                    </div>
+                    <h3>Provider presets</h3>
+                    <p>WEX and Comdata column mappings out of the box. Import your CSV, pick your provider, and the tool maps standard fields automatically.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+                            <path d="M16 4V10M16 22V28M22 10C22 13.3137 19.3137 16 16 16C12.6863 16 10 13.3137 10 10C10 6.68629 12.6863 4 16 4C19.3137 4 22 6.68629 22 10Z" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        </svg>
+                    </div>
+                    <h3>Fuel-type normalizer</h3>
+                    <p>Translate "UNL 87", "REG", or "DIESEL #2" into a controlled enum. Flag unrecognized values and map them inline.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+                            <path d="M16 8V16L20 20M28 16C28 22.6274 22.6274 28 16 28C9.37258 28 4 22.6274 4 16C4 9.37258 9.37258 4 16 4C22.6274 4 28 9.37258 28 16Z" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        </svg>
+                    </div>
+                    <h3>Outlier detector</h3>
+                    <p>Spot negative volumes, missing units, and suspicious odometer jumps. Fix them before they break your audit trail.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+                            <path d="M9 16L13 20L23 10M6 6H26C27.1046 6 28 6.89543 28 8V24C28 25.1046 27.1046 26 26 26H6C4.89543 26 4 25.1046 4 24V8C4 6.89543 4.89543 6 6 6Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
+                    <h3>Audit-ready calculation log</h3>
+                    <p>Every transaction gets a line in the log: volume × factor = CO₂e. Download it with your exports for full traceability.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section 7: How it works -->
+    <section id="how-it-works" class="how-it-works">
+        <div class="container">
+            <h2 class="section-title">How it works</h2>
+            <div class="timeline">
+                <div class="timeline-step">
+                    <div class="timeline-number">1</div>
+                    <div class="timeline-content">
+                        <h3>Import transactions</h3>
+                        <p>Upload your CSV and select a provider preset (WEX, Comdata, or manual mapping). The tool validates:</p>
+                        <ul>
+                            <li>Date format and range</li>
+                            <li>Fuel type presence</li>
+                            <li>Volume and unit fields</li>
+                            <li>Vehicle ID structure</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="timeline-step">
+                    <div class="timeline-number">2</div>
+                    <div class="timeline-content">
+                        <h3>Map &amp; validate</h3>
+                        <p>The tool flags issues inline:</p>
+                        <div class="validation-examples">
+                            <div class="validation-item">⚠ "Unrecognized fuel_type at Row 42; map it."</div>
+                            <div class="validation-item">⚠ "Volume unit missing; choose gal or L."</div>
+                            <div class="validation-item">⚠ "Negative or zero volume at Row 108; review entry."</div>
+                        </div>
+                        <p>Fix them before computing emissions.</p>
+                    </div>
+                </div>
+                <div class="timeline-step">
+                    <div class="timeline-number">3</div>
+                    <div class="timeline-content">
+                        <h3>Compute emissions</h3>
+                        <p>For each transaction: <code>co2e_kg = volume × factor(fuel_type, kg/gal or kg/L)</code></p>
+                        <p><strong>Factor versioning:</strong> EPA Emission Factors Hub 2025, AR5-100 GWP basis.</p>
+                        <p><strong>Intensity (optional):</strong> If odometer data is present, compute kg CO₂e per mile.</p>
+                    </div>
+                </div>
+                <div class="timeline-step">
+                    <div class="timeline-number">4</div>
+                    <div class="timeline-content">
+                        <h3>Export and share</h3>
+                        <p>Download PDF and CSV reports. Every export includes:</p>
+                        <ul>
+                            <li>Factor source and date (EPA Emission Factors Hub, Jan 2025)</li>
+                            <li>Version lock for auditability</li>
+                            <li>GWP basis (AR5-100)</li>
+                            <li>Methodology link (GHG Protocol Corporate Standard)</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section 8: Results preview -->
+    <section class="results-preview">
+        <div class="container">
+            <h2 class="section-title">Results preview</h2>
+            <div class="results-grid">
+                <div class="results-visuals">
+                    <div class="chart-mock">
+                        <div class="chart-title">CO₂e by month</div>
+                        <div class="chart-bars">
+                            <div class="bar-group">
+                                <div class="bar" style="height: 70%"></div>
+                                <div class="bar-label">Jan</div>
+                            </div>
+                            <div class="bar-group">
+                                <div class="bar" style="height: 85%"></div>
+                                <div class="bar-label">Feb</div>
+                            </div>
+                            <div class="bar-group">
+                                <div class="bar" style="height: 90%"></div>
+                                <div class="bar-label">Mar</div>
+                            </div>
+                            <div class="bar-group">
+                                <div class="bar" style="height: 75%"></div>
+                                <div class="bar-label">Apr</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="example-calc">
+                        <div class="example-title">Example calculation:</div>
+                        <code>42 gal gasoline × 8.887 kg/gal = 373.3 kg CO₂e</code>
+                    </div>
+                </div>
+                <div class="results-kpis">
+                    <div class="kpi-tile">
+                        <div class="kpi-label">Total CO₂e (this month)</div>
+                        <div class="kpi-value">24.1 t</div>
+                    </div>
+                    <div class="kpi-tile">
+                        <div class="kpi-label">Vehicles reported</div>
+                        <div class="kpi-value">23</div>
+                    </div>
+                    <div class="kpi-tile">
+                        <div class="kpi-label">Transactions processed</div>
+                        <div class="kpi-value">5,000</div>
+                        <div class="kpi-meta">in 3.2s</div>
+                    </div>
+                    <div class="kpi-tile">
+                        <div class="kpi-label">Intensity (if available)</div>
+                        <div class="kpi-value">0.72</div>
+                        <div class="kpi-meta">kg/mile</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section 9: Schema C -->
+    <section id="schema-c" class="schema-c">
+        <div class="container">
+            <h2 class="section-title">Schema C — the minimal input we need</h2>
+            <div class="schema-content">
+                <div class="schema-fields">
+                    <div class="field-group">
+                        <h4>Required fields:</h4>
+                        <ul>
+                            <li><code>date</code></li>
+                            <li><code>fuel_type</code></li>
+                            <li><code>volume</code></li>
+                            <li><code>unit</code></li>
+                            <li><code>vehicle_id</code></li>
+                        </ul>
+                    </div>
+                    <div class="field-group">
+                        <h4>Optional fields:</h4>
+                        <ul>
+                            <li><code>odometer_end</code></li>
+                            <li><code>cost</code></li>
+                            <li><code>station</code> / <code>vendor</code></li>
+                            <li><code>transaction_id</code></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="schema-example">
+                    <h4>Sample row:</h4>
+                    <pre><code>2025-04-12, gasoline, 42, gal, VAN-12, odometer_end 48217</code></pre>
+                </div>
+                <div class="schema-actions">
+                    <a href="assets/sample-schema-c.csv" class="btn btn-primary" download>Download sample CSV</a>
+                    <a href="#docs" class="btn btn-outline">Open Schema C in Docs</a>
+                    <a href="#presets" class="text-link">See field mapping examples (WEX/Comdata) →</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section 10: Factors & methods -->
+    <section id="factors-methods" class="factors-methods">
+        <div class="container">
+            <h2 class="section-title">Factors you can cite, methods you can trust</h2>
+            <div class="factors-content">
+                <p class="factors-intro"><strong>Emission factors:</strong> EPA Emission Factors Hub, January 2025. <strong>GWP:</strong> AR5-100. Registry versioning locked per project.</p>
+                <div class="factors-table">
+                    <h4>Common fuels and factors:</h4>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Fuel Type</th>
+                                <th>Unit</th>
+                                <th>kg CO₂e / unit</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Gasoline</td>
+                                <td>gallon</td>
+                                <td>8.887</td>
+                            </tr>
+                            <tr>
+                                <td>Diesel</td>
+                                <td>gallon</td>
+                                <td>10.180</td>
+                            </tr>
+                            <tr>
+                                <td>E85</td>
+                                <td>gallon</td>
+                                <td>6.230</td>
+                            </tr>
+                            <tr>
+                                <td>CNG</td>
+                                <td>GGE</td>
+                                <td>6.890</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <p class="factors-footer">Scope 1 per GHG Protocol Corporate Standard. A full calculation log is downloadable with every export.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section 11: Privacy & compliance -->
+    <section class="privacy">
+        <div class="container">
+            <h2 class="section-title">Client-only processing. Zero server dependency.</h2>
+            <div class="grid-3">
+                <div class="privacy-item">
+                    <h4>Your data never leaves your device</h4>
+                    <p>All CSV parsing, validation, and emissions calculations happen in your browser. No upload. No API calls.</p>
+                </div>
+                <div class="privacy-item">
+                    <h4>No accounts or sign-in</h4>
+                    <p>Open the page, drop your CSV, get results. No registration, no tracking, no data retention.</p>
+                </div>
+                <div class="privacy-item">
+                    <h4>Export and close</h4>
+                    <p>Download your PDF and CSV reports, close the tab. Nothing persists on our end.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section 12: Performance and offline -->
+    <section class="performance">
+        <div class="container">
+            <h2 class="section-title">Built to be fast and portable</h2>
+            <div class="grid-3">
+                <div class="performance-item">
+                    <h4>Process 5,000 transactions in seconds</h4>
+                    <p>Streaming parser and in-memory calculation engine. No server round-trips.</p>
+                </div>
+                <div class="performance-item">
+                    <h4>Works offline</h4>
+                    <p>After initial load, the app runs entirely client-side. Save the page for offline use.</p>
+                </div>
+                <div class="performance-item">
+                    <h4>Lightweight bundle</h4>
+                    <p>Plain JavaScript, minimal dependencies. Fast on desktop and mobile.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section 13: Provider presets and extensibility -->
+    <section id="presets" class="presets">
+        <div class="container">
+            <h2 class="section-title">WEX and Comdata out of the box</h2>
+            <div class="grid-2">
+                <div class="preset-item">
+                    <h4>Built-in presets</h4>
+                    <p>Column mappings for WEX FleetCard and Comdata. Select your provider and the tool maps date, fuel type, volume, unit, and vehicle ID automatically.</p>
+                </div>
+                <div class="preset-item">
+                    <h4>Custom mapping</h4>
+                    <p>Got a different provider or custom export? Use the manual mapping mode to define your own column assignments and save them for reuse.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section 14: Exports -->
+    <section id="exports" class="exports">
+        <div class="container">
+            <h2 class="section-title">Exports you can attach to any bid package</h2>
+            <div class="exports-content">
+                <div class="export-format">
+                    <h4>PDF Report includes:</h4>
+                    <ul>
+                        <li>Summary KPIs (total CO₂e, vehicle count, period)</li>
+                        <li>Charts (emissions by month, by vehicle, fuel mix)</li>
+                        <li>Top outliers table</li>
+                        <li>Footer with factor source, version, GWP, methodology link</li>
+                    </ul>
+                </div>
+                <div class="export-format">
+                    <h4>CSV Export includes:</h4>
+                    <ul>
+                        <li>One row per transaction with computed CO₂e</li>
+                        <li>Date, vehicle, fuel type, volume, unit, factor used, CO₂e result</li>
+                        <li>Intensity (kg/mile) if odometer data present</li>
+                        <li>Header row with factor source and version</li>
+                    </ul>
+                </div>
+                <div class="export-format">
+                    <h4>Calculation Log includes:</h4>
+                    <ul>
+                        <li>Transaction ID, row number, formula used</li>
+                        <li>Factor reference (EPA 2025, AR5-100)</li>
+                        <li>Full audit trail for verification</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="export-actions">
+                <button class="btn btn-primary">Export PDF</button>
+                <button class="btn btn-primary">Export CSV</button>
+                <button class="btn btn-outline">Download calculation log</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section 15: Who it's for -->
+    <section class="personas">
+        <div class="container">
+            <h2 class="section-title">Who it's for</h2>
+            <div class="grid-3">
+                <div class="persona-card">
+                    <h4>Fleet managers (1–50 vehicles)</h4>
+                    <blockquote>"I need monthly Scope 1 for our sustainability report, but I don't have time to manually calculate emissions from fuel receipts."</blockquote>
+                </div>
+                <div class="persona-card">
+                    <h4>Sustainability consultants</h4>
+                    <blockquote>"My clients ask for Scope 1 mobile combustion in every RFP. I need a tool I can trust that produces auditable outputs."</blockquote>
+                </div>
+                <div class="persona-card">
+                    <h4>Procurement teams</h4>
+                    <blockquote>"We require emissions data from vendors. This tool lets us normalize their fuel card exports into a standard format we can compare."</blockquote>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section 16: Differentiators -->
+    <section class="differentiators">
+        <div class="container">
+            <h2 class="section-title">Simple by design, rigorous under the hood</h2>
+            <div class="grid-2">
+                <div class="diff-item">
+                    <h4>No telematics hardware</h4>
+                    <p>If you already get fuel card CSVs from your provider, that's all you need. No GPS dongles, no fleet management platform, no monthly subscriptions.</p>
+                </div>
+                <div class="diff-item">
+                    <h4>No servers or APIs</h4>
+                    <p>Everything runs in your browser. Your data never leaves your device. No vendor lock-in, no data retention policies.</p>
+                </div>
+                <div class="diff-item">
+                    <h4>Version-locked factors</h4>
+                    <p>Every project cites a fixed factor registry version. If EPA updates their factors, your historical reports stay consistent.</p>
+                </div>
+                <div class="diff-item">
+                    <h4>Audit-ready from the start</h4>
+                    <p>Calculation log shows every transaction's formula. Exports include factor source, date, GWP, and methodology link.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section 17: Micro roadmap / transparency -->
+    <section class="roadmap">
+        <div class="container">
+            <h2 class="section-title">Roadmap transparency</h2>
+            <div class="roadmap-content">
+                <p class="roadmap-intro">We ship incrementally and in public. Here's what's coming:</p>
+                <ul class="roadmap-list">
+                    <li><strong>D1–D7:</strong> Core parsing, WEX/Comdata presets, EPA 2025 factors, PDF/CSV exports.</li>
+                    <li><strong>D8–D10:</strong> Outlier detection, intensity per mile, custom mapping UI.</li>
+                    <li><strong>D11–D14:</strong> Multi-month aggregation, chart improvements, calculation log download.</li>
+                    <li><strong>Post-launch:</strong> Additional providers, bulk project mode, optional factor registry updates.</li>
+                </ul>
+                <p class="roadmap-note">All updates maintain backward compatibility with Schema C and version-locked factor references.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section 18: FAQs -->
+    <section class="faqs">
+        <div class="container">
+            <h2 class="section-title">Frequently Asked Questions</h2>
+            <div class="faq-list">
+                <div class="faq-item">
+                    <button class="faq-question" aria-expanded="false">
+                        <span>What fuel card providers are supported?</span>
+                        <svg class="faq-icon" width="16" height="16" viewBox="0 0 16 16" fill="none">
+                            <path d="M4 6L8 10L12 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        </svg>
+                    </button>
+                    <div class="faq-answer">
+                        <p>WEX FleetCard and Comdata have built-in presets. Any CSV can be manually mapped to Schema C (date, fuel_type, volume, unit, vehicle_id).</p>
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <button class="faq-question" aria-expanded="false">
+                        <span>Where does the emission factor data come from?</span>
+                        <svg class="faq-icon" width="16" height="16" viewBox="0 0 16 16" fill="none">
+                            <path d="M4 6L8 10L12 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        </svg>
+                    </button>
+                    <div class="faq-answer">
+                        <p>EPA Emission Factors Hub, January 2025 release. GWP basis: AR5-100. Factors are version-locked per project for auditability.</p>
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <button class="faq-question" aria-expanded="false">
+                        <span>Is my data sent to a server?</span>
+                        <svg class="faq-icon" width="16" height="16" viewBox="0 0 16 16" fill="none">
+                            <path d="M4 6L8 10L12 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        </svg>
+                    </button>
+                    <div class="faq-answer">
+                        <p>No. All processing happens in your browser. Your CSVs never leave your device. No upload, no API calls, no data retention.</p>
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <button class="faq-question" aria-expanded="false">
+                        <span>Can I use this offline?</span>
+                        <svg class="faq-icon" width="16" height="16" viewBox="0 0 16 16" fill="none">
+                            <path d="M4 6L8 10L12 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        </svg>
+                    </button>
+                    <div class="faq-answer">
+                        <p>Yes. After the initial page load, the app runs entirely client-side. Save the page for offline use.</p>
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <button class="faq-question" aria-expanded="false">
+                        <span>What outputs do I get?</span>
+                        <svg class="faq-icon" width="16" height="16" viewBox="0 0 16 16" fill="none">
+                            <path d="M4 6L8 10L12 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        </svg>
+                    </button>
+                    <div class="faq-answer">
+                        <p>PDF report with summary KPIs and charts, CSV with per-transaction CO₂e, and a calculation log with full audit trail.</p>
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <button class="faq-question" aria-expanded="false">
+                        <span>What if my fuel type isn't recognized?</span>
+                        <svg class="faq-icon" width="16" height="16" viewBox="0 0 16 16" fill="none">
+                            <path d="M4 6L8 10L12 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        </svg>
+                    </button>
+                    <div class="faq-answer">
+                        <p>The tool flags unrecognized fuel types and lets you map them inline to a standard enum (gasoline, diesel, E85, CNG, etc.).</p>
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <button class="faq-question" aria-expanded="false">
+                        <span>Can I compute intensity (kg CO₂e per mile)?</span>
+                        <svg class="faq-icon" width="16" height="16" viewBox="0 0 16 16" fill="none">
+                            <path d="M4 6L8 10L12 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        </svg>
+                    </button>
+                    <div class="faq-answer">
+                        <p>Yes, if your CSV includes odometer data. The tool computes distance traveled and intensity per vehicle and period.</p>
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <button class="faq-question" aria-expanded="false">
+                        <span>Is this Scope 1, Scope 2, or Scope 3?</span>
+                        <svg class="faq-icon" width="16" height="16" viewBox="0 0 16 16" fill="none">
+                            <path d="M4 6L8 10L12 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        </svg>
+                    </button>
+                    <div class="faq-answer">
+                        <p>Scope 1 (direct emissions from mobile combustion) per GHG Protocol Corporate Standard. This tool does not compute Scope 2 or 3.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section 19: Final CTA band -->
+    <section class="final-cta">
+        <div class="container">
+            <h2>Normalize fuel cards. Ship Scope 1 today.</h2>
+            <div class="final-cta-buttons">
+                <a href="#" class="btn btn-primary btn-large">Launch in browser</a>
+                <a href="assets/sample-schema-c.csv" class="btn btn-outline btn-large" download>Download sample CSV</a>
+                <a href="#factors-methods" class="btn btn-outline btn-large">Read Factors &amp; Methods</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section 20: Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-column">
+                    <h5>Product</h5>
+                    <a href="#product">Features</a>
+                    <a href="#how-it-works">How it works</a>
+                    <a href="#schema-c">Schema C</a>
+                    <a href="#exports">Exports</a>
+                </div>
+                <div class="footer-column">
+                    <h5>Methods</h5>
+                    <a href="#factors-methods">Factors &amp; Methods</a>
+                    <a href="#factors-methods">EPA 2025 Factors</a>
+                    <a href="#factors-methods">GHG Protocol</a>
+                    <a href="#exports">Calculation Log</a>
+                </div>
+                <div class="footer-column">
+                    <h5>Resources</h5>
+                    <a href="#docs">Documentation</a>
+                    <a href="assets/sample-schema-c.csv">Sample CSV</a>
+                    <a href="assets/sample-report.pdf">Sample Report</a>
+                    <a href="#faqs">FAQs</a>
+                </div>
+                <div class="footer-column">
+                    <h5>Company</h5>
+                    <a href="https://github.com/chaos-factory/ideator-execution-009Carbonaccounting-2-FuelCardCruncher">GitHub</a>
+                    <a href="#roadmap">Roadmap</a>
+                    <a href="#privacy">Privacy</a>
+                </div>
+            </div>
+            <div class="footer-legal">
+                <p>Emission factors: EPA Emission Factors Hub (Jan 2025). GWP basis: AR5-100. Scope 1 per GHG Protocol Corporate Standard.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js" defer></script>
+</body>
+</html>
